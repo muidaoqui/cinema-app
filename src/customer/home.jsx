@@ -22,6 +22,48 @@ function Home() {
       });
   }, []);
 
+  const [movies, setMovies] = useState([]);
+  useEffect(() => {
+    axios.get('http://localhost:5000/api/movies')
+      .then(response => {
+        console.log('Movies data:', response.data);
+        if (response.data.length > 0) {
+          setMovies(response.data);
+        }
+      })
+      .catch(error => {
+        console.error('Lỗi khi lấy movies:', error);
+      });
+  }, []);
+
+  const [comingSoons, setComingSoons] = useState([]);
+  useEffect(() => {
+    axios.get('http://localhost:5000/api/comingsoon')
+      .then(response => {
+        console.log('Coming Soon data:', response.data);
+        if (response.data.length > 0) {
+          setComingSoons(response.data);
+        }
+      })
+      .catch(error => {
+        console.error('Lỗi khi lấy Coming Soon:', error);
+      });
+  }, []);
+
+  const [discounts, setDiscounts] = useState([]);
+  useEffect(() => {
+    axios.get('http://localhost:5000/api/discounts')
+      .then(response => {
+        console.log('Discounts data:', response.data);
+        if (response.data.length > 0) {
+          setDiscounts(response.data);
+        }
+      })
+      .catch(error => {
+        console.error('Lỗi khi lấy Discounts:', error);
+      });
+  }, []);
+
   const settings = {
     dots: true,
     infinite: true,
@@ -41,6 +83,36 @@ function Home() {
       }
     ]
   };
+
+  const Settings = {
+  dots: false,            // hoặc true nếu muốn chấm trượt
+  infinite: false,        // không lặp lại
+  speed: 500,             // tốc độ chuyển slide
+  slidesToShow: 3,        // số lượng item hiển thị cùng lúc
+  slidesToScroll: 1,      // số lượng item trượt mỗi lần
+  arrows: true,           // hiển thị mũi tên
+  responsive: [
+    {
+      breakpoint: 1024,
+      settings: {
+        slidesToShow: 3,
+      }
+    },
+    {
+      breakpoint: 768,
+      settings: {
+        slidesToShow: 2,
+      }
+    },
+    {
+      breakpoint: 480,
+      settings: {
+        slidesToShow: 1,
+      }
+    }
+  ]
+};
+
 
   const [activeTab, setActiveTab] = useState("tab1");
 
@@ -94,23 +166,75 @@ function Home() {
 
       {/* Nội dung tab */}
       <div style={{ marginTop: 20 }}>
-        {activeTab === "tab1" && 
-        <div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 px-4">
-                {images.map((img, index) => (
-                <img
-                    key={index}
-                    src={img}
-                    alt={`poster-${index}`}
-                    className="w-full h-40 object-cover rounded shadow"
-                />
-                ))}
-            </div>
-        </div>}
-        {activeTab === "tab2" && <div>Nội dung của Tab 2</div>}
+        {activeTab === "tab1" && (
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 px-4">
+      {movies.map((movie, index) => (
+  movie.infoMo?.somePic?.map((pic, picIndex) => (
+    <div
+      key={`${index}-${picIndex}`}
+      className="relative rounded overflow-hidden shadow"
+    >
+      <img
+        src={pic}
+        alt={`somePic-${index}-${picIndex}`}
+        className="w-full h-40 object-cover"
+      />
+      <div className="absolute top-2 left-2 bg-black bg-opacity-60 text-white text-xs px-2 py-1 rounded">
+        ⭐ {movie.ratingMo} | ⛔ {movie.agelimitMo}
+      </div>
+      <div className="bg-white text-center text-sm font-semibold mt-1 py-1 truncate">
+        {movie.nameMo}
       </div>
     </div>
-
+  ))
+))}
+</div>)}
+        {activeTab === "tab2" && 
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 px-4">
+      {comingSoons.map((coming, index) => (
+  coming.infoMo?.somePic?.map((pic, picIndex) => (
+    <div
+      key={`${index}-${picIndex}`}
+      className="relative rounded overflow-hidden shadow"
+    >
+      <img
+        src={pic}
+        alt={`somePic-${index}-${picIndex}`}
+        className="w-full h-40 object-cover"
+      />
+      <div className="absolute top-2 left-2 bg-black bg-opacity-60 text-white text-xs px-2 py-1 rounded">
+        ⭐ {coming.ratingMo} | ⛔ {coming.agelimitMo}
+      </div>
+      <div className="bg-white text-center text-sm font-semibold mt-1 py-1 truncate">
+        {coming.nameMo}
+      </div>
+    </div>
+  ))
+))}
+</div>}
+      </div>
+    </div>
+      <div className="px-4 my-4 mb-20">
+        <Slider {...settings}>
+  {discounts.map((discount, index) => (
+    <div
+      key={index}
+      className="px-2" // Padding giữa các slide
+    >
+      <div className="relative rounded overflow-hidden shadow">
+        <img
+          src={discount.image}
+          alt={`discount-${index}`}
+          className="w-full h-40 object-cover"
+        />
+        <div className="bg-white text-center text-sm font-semibold mt-1 py-1 truncate">
+          {discount.title}
+        </div>
+      </div>
+    </div>
+  ))}
+</Slider>
+      </div>
       {/* Footer giữ nguyên như cũ */}
       <footer className="mt-auto">
         <nav>
