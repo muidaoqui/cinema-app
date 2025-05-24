@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Slider from "react-slick";
-import { AiOutlineHome } from 'react-icons/ai';
-import { FaFilm, FaShoppingCart, FaUser } from 'react-icons/fa';
-import { MdLocalMovies } from 'react-icons/md';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
@@ -235,43 +232,6 @@ function Home() {
   ))}
 </Slider>
       </div>
-      {/* Footer giữ nguyên như cũ */}
-      <footer className="mt-auto">
-        <nav>
-          <ul className="flex justify-center space-x-4 text-gray-500 text-sm fixed bottom-0 left-0 right-0 bg-white py-4">
-            <li className="flex flex-col items-center hover:text-black cursor-pointer">
-              <a href="#home" className="flex flex-col items-center">
-                <AiOutlineHome size={24} />
-                <span>Trang chủ</span>
-              </a>
-            </li>
-            <li className="flex flex-col items-center hover:text-black cursor-pointer">
-              <a href="#cinema" className="flex flex-col items-center">
-                <FaFilm size={24} />
-                <span>Rạp phim</span>
-              </a>
-            </li>
-            <li className="flex flex-col items-center hover:text-black cursor-pointer">
-              <a href="#products" className="flex flex-col items-center">
-                <FaShoppingCart size={24} />
-                <span>Sản phẩm</span>
-              </a>
-            </li>
-            <li className="flex flex-col items-center hover:text-black cursor-pointer">
-              <a href="#movies" className="flex flex-col items-center">
-                <MdLocalMovies size={24} />
-                <span>Điện ảnh</span>
-              </a>
-            </li>
-            <li className="flex flex-col items-center hover:text-black cursor-pointer">
-              <a href="#account" className="flex flex-col items-center">
-                <FaUser size={24} />
-                <span>Tài khoản</span>
-              </a>
-            </li>
-          </ul>
-        </nav>
-      </footer>
     </div>
   );
 }
