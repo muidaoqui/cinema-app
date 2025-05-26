@@ -6,9 +6,9 @@ import { MdLocalMovies } from 'react-icons/md';
 function Navbar() {
   return (
     <div className="navbar">
-      <footer className="mt-auto">
+      <footer className="mt-auto fixed z-10 bottom-0 left-0 right-0 bg-white shadow-lg pb-8 pt-4">
         <nav>
-          <ul className="flex justify-center space-x-4 text-gray-500 text-sm fixed bottom-0 left-0 right-0 bg-white py-4">
+          <ul className="flex justify-center space-x-4 text-gray-500 text-sm">
   <li className="flex flex-col items-center hover:text-black cursor-pointer">
     <Link to="/" className="flex flex-col items-center">
       <AiOutlineHome size={24} />
