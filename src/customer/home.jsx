@@ -114,10 +114,7 @@ function Home() {
   const [activeTab, setActiveTab] = useState("tab1");
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <h1 className="text-xl font-bold text-center my-4">Welcome to the Home Page</h1>
-      <p className="text-center mb-6">This is the home page of our application.</p>
-
+    <div className="min-h-screen flex flex-col mb-10 mt-4">
       <div className="px-4 mb-10">
         {/* npm install react-slick slick-carousel */}
         <Slider {...settings}>

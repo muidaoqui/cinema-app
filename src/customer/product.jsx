@@ -93,7 +93,7 @@ function Product() {
     };
 
     return(
-        <div>
+        <div className='mb-28 mt-4'>
             <div className="px-4 mb-10">
                 {/* npm install react-slick slick-carousel */}
                 <Slider {...settings}>

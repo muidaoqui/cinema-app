@@ -28,7 +28,7 @@ function Navbar() {
     </Link>
   </li>
   <li className="flex flex-col items-center hover:text-black cursor-pointer">
-    <Link to="/movies" className="flex flex-col items-center">
+    <Link to="/news" className="flex flex-col items-center">
       <MdLocalMovies size={24} />
       <span>Điện ảnh</span>
     </Link>

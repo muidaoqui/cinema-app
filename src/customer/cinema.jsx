@@ -15,7 +15,7 @@ function Cinema() {
     }, []);
 
     return(
-        <div>
+        <div className='mb-28'>
             <h1 className="text-2xl font-bold text-center mt-4">Rạp Phim</h1>
             <div className="flex flex-col mt-4">
                 {cinemas.map((cinema, index) => (
