@@ -7,6 +7,7 @@ import Navbar from './customer/navbar';
 import Cinema from './customer/cinema';
 import Products from './customer/product';
 import News from './customer/news';
+import Account from './customer/account'; 
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
@@ -18,6 +19,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="/cinema" element={<Cinema />} />
         <Route path="/products" element={<Products />} />
         <Route path="/news" element={<News />} />
+        <Route path="/account" element={<Account />} />
+        {/* Redirect any unknown paths to home */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>
