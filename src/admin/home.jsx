@@ -1,40 +1,29 @@
-import React, { useState } from 'react';
-import { Space, Table, Tag, Switch } from 'antd'; // Giữ lại Switch vì bạn có thể muốn điều khiển theme từ đây
-import { useTheme } from './themecontext'; // Import hook useTheme
+import React, { useState, useEffect } from 'react';
+import { Space, Table, Tag, Switch } from 'antd';
+import { useTheme } from './themecontext';
+import axios from 'axios';  // thêm axios để gọi API
 
 function HomeAdmin() {
-  const { Column, ColumnGroup } = Table;
-  const { currentTheme, changeTheme } = useTheme(); // Lấy theme và hàm đổi theme từ Context
-
-  const data = [
-    {
-      key: '1',
-      firstName: 'John',
-      lastName: 'Brown',
-      age: 32,
-      address: 'New York No. 1 Lake Park',
-      tags: ['nice', 'developer'],
-    },
-    {
-      key: '2',
-      firstName: 'Jim',
-      lastName: 'Green',
-      age: 42,
-      address: 'London No. 1 Lake Park',
-      tags: ['loser'],
-    },
-    {
-      key: '3',
-      firstName: 'Joe',
-      lastName: 'Black',
-      age: 32,
-      address: 'Sydney No. 1 Lake Park',
-      tags: ['cool', 'teacher'],
-    },
-  ];
-
-  // current state cho việc chọn hàng trong bảng, không liên quan đến theme
+  const { Column } = Table;
+  const { currentTheme, changeTheme } = useTheme();
+  const [data, setData] = useState([]);
   const [currentSelectedRowKey, setCurrentSelectedRowKey] = useState('');
+
+  useEffect(() => {
+    // Giả sử API endpoint là /api/users
+    axios.get('http://localhost:5000/api/users')  // đổi endpoint theo server của bạn
+      .then(res => {
+        const users = res.data.map((user, index) => ({
+          key: index + 1,
+          email: user.email,
+          fullname: user.fullname,
+          age: user.age,
+          role: user.role
+        }));
+        setData(users);
+      })
+      .catch(err => console.error(err));
+  }, []);
 
   const onRowClick = (record, index) => {
     console.log('Hàng được nhấp:', record);
@@ -42,41 +31,30 @@ function HomeAdmin() {
   };
 
   return (
-    <div className="flex-grow w-5/6  float-right"> {/* Sử dụng flex-grow để chiếm hết không gian còn lại */}
-      
+    <div className="flex-grow w-5/6 float-right">
       <Table
         dataSource={data}
         onRow={(record, rowIndex) => {
           return {
-            onClick: (event) => {
-              onRowClick(record, rowIndex);
-            },
+            onClick: () => onRowClick(record, rowIndex),
           };
         }}
-        // Không truyền 'theme' vào Table trực tiếp, nó được quản lý bởi ConfigProvider
-        // Bạn có thể thêm class Tailwind để điều chỉnh màu nền của bảng nếu cần
         className="bg-white dark:bg-gray-700 rounded-lg shadow-md overflow-hidden"
       >
-        <ColumnGroup title="Tên">
-          <Column title="Tên đầu" dataIndex="firstName" key="firstName" />
-          <Column title="Tên cuối" dataIndex="lastName" key="lastName" />
-        </ColumnGroup>
+        <Column title="Email" dataIndex="email" key="email" />
+        <Column title="Họ Tên" dataIndex="fullname" key="fullname" />
         <Column title="Tuổi" dataIndex="age" key="age" />
-        <Column title="Địa chỉ" dataIndex="address" key="address" />
         <Column
           title="Thẻ"
-          dataIndex="tags"
-          key="tags"
-          render={(tags) => (
+          dataIndex="role"
+          key="role"
+          render={(roles) => (
             <>
-              {tags.map((tag) => {
-                let color = tag.length > 5 ? 'geekblue' : 'green';
-                if (tag === 'loser') {
-                  color = 'volcano';
-                }
+              {roles.map((role) => {
+                let color = role === 'VIP' ? 'gold' : 'blue';
                 return (
-                  <Tag color={color} key={tag}>
-                    {tag.toUpperCase()}
+                  <Tag color={color} key={role}>
+                    {role.toUpperCase()}
                   </Tag>
                 );
               })}
@@ -88,18 +66,19 @@ function HomeAdmin() {
           key="action"
           render={(_, record) => (
             <Space size="middle">
-              <a className="text-blue-500 hover:text-blue-700">Mời {record.lastName}</a>
+              <a className="text-blue-500 hover:text-blue-700">Sửa {record.fullname}</a>
               <a className="text-red-500 hover:text-red-700">Xóa</a>
             </Space>
           )}
         />
       </Table>
+
       <div className="p-4 flex justify-center mt-4">
         <Switch
-            checked={currentTheme === 'dark'}
-            onChange={changeTheme}
-            checkedChildren="Tối"
-            unCheckedChildren="Sáng"
+          checked={currentTheme === 'dark'}
+          onChange={changeTheme}
+          checkedChildren="Tối"
+          unCheckedChildren="Sáng"
         />
         <span className="ml-2 text-black dark:text-white">Chế độ hiển thị từ Home</span>
       </div>
