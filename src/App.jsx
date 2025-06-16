@@ -4,6 +4,7 @@ import { ThemeProvider } from './admin/themecontext'; // Import ThemeProvider
 import NavbarAdmin from './admin/navbar';
 import Account from './admin/home';
 import Movie from './admin/movie';
+import Cinema from './admin/cinema';
 import ToolBar from './admin/toolbar'
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Routes>
             <Route path="/account" element={<Account />} />
             <Route path="/movie" element={<Movie />} />
+            <Route path="/cinema" element={<Cinema />} />
           </Routes>
         </div>
       </BrowserRouter>

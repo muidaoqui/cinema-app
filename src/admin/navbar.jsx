@@ -41,7 +41,7 @@ function NavbarAdmin() {
     },
     {
       key: 'sub4',
-      label: 'Rạp chiếu',
+      label: <div onClick={() => navigate('/cinema')}>Rạp chiếu</div>,
       icon: <AppstoreOutlined />,
       children: [
         { key: '9', label: 'Tùy chọn 9', path: '/option9' },
