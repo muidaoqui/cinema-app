@@ -5,6 +5,7 @@ import NavbarAdmin from './admin/navbar';
 import Account from './admin/home';
 import Movie from './admin/movie';
 import Cinema from './admin/cinema';
+import News from './admin/news';
 import ToolBar from './admin/toolbar'
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
             <Route path="/account" element={<Account />} />
             <Route path="/movie" element={<Movie />} />
             <Route path="/cinema" element={<Cinema />} />
+            <Route path="/news" element={<News />} />
           </Routes>
         </div>
       </BrowserRouter>

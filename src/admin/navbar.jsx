@@ -58,7 +58,7 @@ function NavbarAdmin() {
     },
     {
       key: 'sub5',
-      label: 'Tin tức',
+      label: <div onClick={() => navigate('/news')}>Tin tức</div>,
       icon: <SettingOutlined />,
       children: [
         { key: '13', label: 'Tùy chọn 13', path: '/option13' },
