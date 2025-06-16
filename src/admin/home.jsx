@@ -3,7 +3,7 @@ import { Space, Table, Tag, Switch } from 'antd';
 import { useTheme } from './themecontext';
 import axios from 'axios';  // thêm axios để gọi API
 
-function HomeAdmin() {
+function Account() {
   const { Column } = Table;
   const { currentTheme, changeTheme } = useTheme();
   const [data, setData] = useState([]);
@@ -73,17 +73,9 @@ function HomeAdmin() {
         />
       </Table>
 
-      <div className="p-4 flex justify-center mt-4">
-        <Switch
-          checked={currentTheme === 'dark'}
-          onChange={changeTheme}
-          checkedChildren="Tối"
-          unCheckedChildren="Sáng"
-        />
-        <span className="ml-2 text-black dark:text-white">Chế độ hiển thị từ Home</span>
-      </div>
+      
     </div>
   );
 }
 
-export default HomeAdmin;
+export default Account;
