@@ -10,8 +10,7 @@ function Account() {
   const [currentSelectedRowKey, setCurrentSelectedRowKey] = useState('');
 
   useEffect(() => {
-    // Giả sử API endpoint là /api/users
-    axios.get('http://localhost:5000/api/users')  // đổi endpoint theo server của bạn
+    axios.get('http://localhost:5000/api/users')  
       .then(res => {
         const users = res.data.map((user, index) => ({
           key: index + 1,

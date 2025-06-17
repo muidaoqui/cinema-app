@@ -31,7 +31,7 @@ function NavbarAdmin() {
         { key: '6', label: 'Tùy chọn 6', path: '/option6' },
         {
           key: 'sub3',
-          label: 'Menu con',
+          label: <div onClick={() => navigate('/coming')}>Sắp chiếu</div>,
           children: [
             { key: '7', label: 'Tùy chọn 7', path: '/option7' },
             { key: '8', label: 'Tùy chọn 8', path: '/option8' },
@@ -48,7 +48,7 @@ function NavbarAdmin() {
         { key: '10', label: 'Tùy chọn 10', path: '/option10' },
         {
           key: 'sub3_cinema',
-          label: 'Menu con',
+          label: <div onClick={() => navigate('/product')}>Sản phẩm</div>,
           children: [
             { key: '11', label: 'Tùy chọn 11', path: '/option11' },
             { key: '12', label: 'Tùy chọn 12', path: '/option12' },
@@ -63,6 +63,14 @@ function NavbarAdmin() {
       children: [
         { key: '13', label: 'Tùy chọn 13', path: '/option13' },
         { key: '14', label: 'Tùy chọn 14', path: '/option14' },
+        {
+          key: 'sub3_dis',
+          label: <div onClick={() => navigate('/discount')}>Khuyến mãi</div>,
+          children: [
+            { key: '11', label: 'Tùy chọn 11', path: '/option11' },
+            { key: '12', label: 'Tùy chọn 12', path: '/option12' },
+          ],
+        },
       ],
     },
   ];
