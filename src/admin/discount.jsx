@@ -9,7 +9,7 @@ function Discount() {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/discount') 
+    axios.get('http://localhost:5000/api/discounts') 
       .then(res => {
         const list = res.data.map((item, index) => ({
           key: index + 1,

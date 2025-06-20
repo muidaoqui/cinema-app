@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Space, Table, Tag, Switch } from 'antd';
+import {
+    Space, Table, Tag, Drawer, Form, Input, InputNumber, Button, message
+} from 'antd';
 import { useTheme } from './themecontext';
 import axios from 'axios';
 
@@ -7,7 +9,7 @@ function Cinema() {
   const { Column } = Table;
   const { currentTheme, changeTheme } = useTheme();
   const [data, setData] = useState([]);
-  const [currentSelectedRowKey, setCurrentSelectedRowKey] = useState('');
+  
 
   useEffect(() => {
     axios.get('http://localhost:5000/api/cinemas')
@@ -23,6 +25,8 @@ function Cinema() {
       })
       .catch(err => console.error(err));
   }, []);
+
+  
 
   const onRowClick = (record, index) => {
     console.log('Hàng được nhấp:', record);
