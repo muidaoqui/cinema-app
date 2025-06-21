@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import {
     Space, Table, Tag, Drawer, Form, Input, InputNumber, Button, message
@@ -9,27 +10,11 @@ function Movie() {
     const { Column } = Table;
     const { currentTheme } = useTheme();
     const [data, setData] = useState([]);
+    const [originalData, setOriginalData] = useState([]);
     const [editingMovie, setEditingMovie] = useState(null);
     const [isAddDrawerOpen, setIsAddDrawerOpen] = useState(false);
     const [form] = Form.useForm();
     const [addForm] = Form.useForm();
-
-    const handleEdit = (record) => {
-        setEditingMovie({
-            _id: record._id,
-            name: record.name,
-            director: record.director || '',
-            actor: record.actor || '',
-            agelimit: record.agelimit,
-            rating: record.rating,
-            news: record.news,
-            pic: record.pic || '',
-            cinema: record.cinema,
-            showtime: record.showtime,
-            comments: record.comments,
-            content: record.content
-        });
-    };
 
     useEffect(() => {
         axios.get('http://localhost:5000/api/movies')
@@ -43,13 +28,14 @@ function Movie() {
                     agelimit: item.agelimitMo,
                     rating: item.ratingMo,
                     news: item.newsMo,
+                    content: item.infoMo?.content,
                     pic: item.infoMo?.somePic?.[0],
                     cinema: item.cinemaMo,
                     showtime: item.showtimeMo,
-                    content: item.infoMo?.content,
                     comments: item.infoMo?.comments
                 }));
                 setData(processed);
+                setOriginalData(processed);
             })
             .catch((err) => console.error(err));
     }, []);
@@ -58,7 +44,11 @@ function Movie() {
         if (editingMovie) {
             form.setFieldsValue(editingMovie);
         }
-    }, [editingMovie, form]);
+    }, [editingMovie]);
+
+    const handleEdit = (record) => {
+        setEditingMovie({ ...record });
+    };
 
     const handleSave = () => {
         form.validateFields().then((values) => {
@@ -71,10 +61,10 @@ function Movie() {
                 showtimeMo: editingMovie.showtime,
                 infoMo: {
                     director: values.director,
-                    actor: values.actor.split(',').map(a => a.trim()),
+                    actor: (values.actor || '').split(',').map(a => a.trim()).filter(Boolean),
                     comments: editingMovie.comments || [],
                     somePic: [values.pic],
-                    content: editingMovie.content || '',
+                    content: values.content || ''
                 }
             };
 
@@ -82,7 +72,8 @@ function Movie() {
                 .then(() => {
                     message.success('Cập nhật thành công');
                     setEditingMovie(null);
-                    window.location.reload();
+                    setData(prev => prev.map(m => m._id === editingMovie._id ? { ...m, ...values } : m));
+                    setOriginalData(prev => prev.map(m => m._id === editingMovie._id ? { ...m, ...values } : m));
                 })
                 .catch((err) => {
                     console.error("Update failed:", err);
@@ -96,6 +87,7 @@ function Movie() {
         axios.delete(`http://localhost:5000/api/movies/delete/${_id}`)
             .then(() => {
                 setData(prev => prev.filter(movie => movie._id !== _id));
+                setOriginalData(prev => prev.filter(movie => movie._id !== _id));
                 message.success({ content: 'Xóa thành công', key: 'delete' });
             })
             .catch(err => {
@@ -115,19 +107,28 @@ function Movie() {
                 showtimeMo: [],
                 infoMo: {
                     director: values.director,
-                    actor: values.actor.split(',').map(a => a.trim()),
+                    actor: (values.actor || '').split(',').map(a => a.trim()).filter(Boolean),
                     somePic: [values.pic],
                     comments: [],
-                    content: ''
+                    content: values.content || ''
                 }
             };
 
             axios.post('http://localhost:5000/api/movies', payload)
                 .then(res => {
                     message.success('Thêm phim thành công');
+                    const newMovie = {
+                        key: data.length + 1,
+                        _id: res.data._id,
+                        ...values,
+                        cinema: [],
+                        showtime: [],
+                        comments: []
+                    };
+                    setData(prev => [...prev, newMovie]);
+                    setOriginalData(prev => [...prev, newMovie]);
                     setIsAddDrawerOpen(false);
                     addForm.resetFields();
-                    window.location.reload();
                 })
                 .catch((err) => {
                     console.error(err);
@@ -143,7 +144,7 @@ function Movie() {
                 allowClear
                 style={{ marginBottom: 16 }}
                 onSearch={(value) => {
-                    const filtered = data.filter(movie => movie.name.toLowerCase().includes(value.toLowerCase()));
+                    const filtered = originalData.filter(movie => movie.name.toLowerCase().includes(value.toLowerCase()));
                     setData(filtered);
                 }}
             />
@@ -154,57 +155,30 @@ function Movie() {
 
             <Table dataSource={data} pagination={{ pageSize: 5 }} rowKey="_id">
                 <Column title="Tên Phim" dataIndex="name" key="name" />
-                <Column
-                    title="Cụm rạp"
-                    dataIndex="cinema"
-                    key="cinema"
-                    render={(cinemas) => cinemas?.map((c, i) => <Tag key={i}>{c}</Tag>)}
-                />
+                <Column title="Cụm rạp" dataIndex="cinema" key="cinema" render={(cinemas) => cinemas?.map((c, i) => <Tag key={i}>{c}</Tag>)} />
                 <Column title="Đạo Diễn" dataIndex="director" key="director" />
                 <Column title="Diễn Viên" dataIndex="actor" key="actor" />
-                <Column
-                    title="Giới Hạn Tuổi"
-                    dataIndex="agelimit"
-                    key="agelimit"
-                    render={(age) => {
-                        let color = 'green';
-                        if (age > 17) color = 'red';
-                        else if (age > 15) color = 'orange';
-                        else if (age > 11) color = 'gold';
-                        return <Tag color={color}>{age}+</Tag>;
-                    }}
-                />
+                <Column title="Nội dung" dataIndex="content" key="content" />
+                <Column title="Giới Hạn Tuổi" dataIndex="agelimit" key="agelimit" render={(age) => {
+                    let color = age > 17 ? 'red' : age > 15 ? 'orange' : age > 11 ? 'gold' : 'green';
+                    return <Tag color={color}>{age}+</Tag>;
+                }} />
                 <Column title="Đánh Giá" dataIndex="rating" key="rating" />
                 <Column title="Tin Tức" dataIndex="news" key="news" />
-                <Column
-                    title="Poster"
-                    dataIndex="pic"
-                    key="pic"
-                    render={(pic) => <img src={pic} alt="poster" style={{ width: 100, height: 150, objectFit: 'cover' }} />}
-                />
-                <Column
-                    title="Suất Chiếu"
-                    dataIndex="showtime"
-                    key="showtime"
-                    render={(times) => (
-                        Array.isArray(times) && times.length > 0
-                            ? times.map((time, index) => <div key={index}>{new Date(time).toLocaleString()}</div>)
-                            : <Tag color="gray">Chưa có</Tag>
-                    )}
-                />
-                <Column
-                    title="Hành động"
-                    key="action"
-                    render={(_, record) => (
-                        <Space size="middle">
-                            <a onClick={() => handleEdit(record)}>Sửa</a>
-                            <a onClick={() => handleDelete(record._id)}>Xóa</a>
-                        </Space>
-                    )}
-                />
+                <Column title="Poster" dataIndex="pic" key="pic" render={(pic) => <img src={pic} alt="poster" style={{ width: 100, height: 150, objectFit: 'cover' }} />} />
+                <Column title="Suất Chiếu" dataIndex="showtime" key="showtime" render={(times) => (
+                    Array.isArray(times) && times.length > 0
+                        ? times.map((time, index) => <div key={index}>{new Date(time).toLocaleString()}</div>)
+                        : <Tag color="gray">Chưa có</Tag>
+                )} />
+                <Column title="Hành động" key="action" render={(_, record) => (
+                    <Space size="middle">
+                        <a onClick={() => handleEdit(record)}>Sửa</a>
+                        <a onClick={() => handleDelete(record._id)}>Xóa</a>
+                    </Space>
+                )} />
             </Table>
 
-            {/* Drawer Chỉnh sửa */}
             <Drawer
     title="Chỉnh sửa thông tin phim"
     placement="right"
@@ -222,8 +196,7 @@ function Movie() {
         <Form
             form={form}
             layout="vertical"
-            initialValues={editingMovie}
-            key={editingMovie._id} // Force reset form mỗi khi chỉnh phim mới
+            key={editingMovie._id} // <-- Force reset form mỗi khi chọn mới
         >
             <Form.Item label="Tên phim" name="name" rules={[{ required: true }]}>
                 <Input />
@@ -246,25 +219,20 @@ function Movie() {
             <Form.Item label="Poster (URL)" name="pic">
                 <Input />
             </Form.Item>
+            <Form.Item label="Nội dung" name="content">
+                <Input.TextArea rows={4} />
+            </Form.Item>
         </Form>
     )}
 </Drawer>
 
 
-            {/* Drawer Thêm mới */}
-            <Drawer
-                title="Thêm phim mới"
-                placement="right"
-                width={400}
-                onClose={() => setIsAddDrawerOpen(false)}
-                open={isAddDrawerOpen}
-                footer={
-                    <div style={{ textAlign: 'right' }}>
-                        <Button onClick={() => setIsAddDrawerOpen(false)} style={{ marginRight: 8 }}>Hủy</Button>
-                        <Button type="primary" onClick={handleAddMovie}>Thêm</Button>
-                    </div>
-                }
-            >
+            <Drawer title="Thêm phim mới" placement="right" width={400} onClose={() => setIsAddDrawerOpen(false)} open={isAddDrawerOpen} footer={
+                <div style={{ textAlign: 'right' }}>
+                    <Button onClick={() => setIsAddDrawerOpen(false)} style={{ marginRight: 8 }}>Hủy</Button>
+                    <Button type="primary" onClick={handleAddMovie}>Thêm</Button>
+                </div>
+            }>
                 <Form form={addForm} layout="vertical">
                     <Form.Item label="Tên phim" name="name" rules={[{ required: true }]}> <Input /> </Form.Item>
                     <Form.Item label="Đạo diễn" name="director"> <Input /> </Form.Item>
@@ -273,6 +241,7 @@ function Movie() {
                     <Form.Item label="Đánh giá" name="rating"> <InputNumber min={0} max={10} step={0.1} /> </Form.Item>
                     <Form.Item label="Tin tức" name="news"> <Input /> </Form.Item>
                     <Form.Item label="Poster (URL)" name="pic"> <Input /> </Form.Item>
+                    <Form.Item label="Nội dung" name="content"> <Input.TextArea rows={4} /> </Form.Item>
                 </Form>
             </Drawer>
         </div>
