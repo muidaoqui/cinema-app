@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
@@ -10,6 +11,7 @@ function Home() {
   const [comingSoons, setComingSoons] = useState([]);
   const [discounts, setDiscounts] = useState([]);
   const [activeTab, setActiveTab] = useState("tab1");
+  const navigate = useNavigate();
 
   const BASE_URL = "http://localhost:5000/";
 
@@ -57,6 +59,10 @@ function Home() {
       .catch(err => console.error("Discounts error:", err));
   }, []);
 
+  const handleMovieClick = (id) => {
+    navigate(`/detail/${id}`);
+  };
+
   return (
     <div className="min-h-screen flex flex-col mb-10 mt-4">
       {/* POSTER SLIDER */}
@@ -66,7 +72,7 @@ function Home() {
             <div key={idx} className="px-2">
               <img
                 src={img}
-                alt={idx}
+                alt={`poster-${idx}`}
                 className="w-full h-60 object-cover rounded-xl shadow"
               />
             </div>
@@ -97,11 +103,11 @@ function Home() {
         {/* MOVIE GRID */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 px-4 mt-4">
           {(activeTab === "tab1" ? movies : comingSoons).map((item, idx) =>
-            Array.isArray(item.infoMo?.somePic) &&
-            item.infoMo.somePic.map((pic, picIdx) => (
+            item.infoMo?.somePic?.map((pic, picIdx) => (
               <div
-                key={`${item._id || idx}-${picIdx}`}
-                className="relative rounded overflow-hidden shadow hover:scale-105 transition-transform duration-300"
+                key={`${item._id}-${picIdx}`}
+                className="relative rounded overflow-hidden shadow hover:scale-105 transition-transform duration-300 cursor-pointer"
+                onClick={() => handleMovieClick(item._id)}
               >
                 <img
                   src={pic}
