@@ -1,48 +1,38 @@
-import React, { useEffect, useState} from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { AiOutlineHome } from 'react-icons/ai';
 import { FaFilm, FaShoppingCart, FaUser } from 'react-icons/fa';
 import { MdLocalMovies } from 'react-icons/md';
+
 function Navbar() {
+  const location = useLocation();
+  const current = location.pathname;
+
+  const navItems = [
+    { path: "/", icon: <AiOutlineHome size={24} />, label: "Trang chủ" },
+    { path: "/cinema", icon: <FaFilm size={24} />, label: "Rạp phim" },
+    { path: "/products", icon: <FaShoppingCart size={24} />, label: "Sản phẩm" },
+    { path: "/news", icon: <MdLocalMovies size={24} />, label: "Điện ảnh" },
+    { path: "/account", icon: <FaUser size={24} />, label: "Tài khoản" },
+  ];
+
   return (
-    <div className="navbar">
-      <footer className="mt-auto fixed z-10 bottom-0 left-0 right-0 bg-white shadow-lg pb-8 pt-4">
-        <nav>
-          <ul className="flex justify-center space-x-4 text-gray-500 text-sm">
-  <li className="flex flex-col items-center hover:text-black cursor-pointer">
-    <Link to="/" className="flex flex-col items-center">
-      <AiOutlineHome size={24} />
-      <span>Trang chủ</span>
-    </Link>
-  </li>
-  <li className="flex flex-col items-center hover:text-black cursor-pointer">
-    <Link to="/cinema" className="flex flex-col items-center">
-      <FaFilm size={24} />
-      <span>Rạp phim</span>
-    </Link>
-  </li>
-  <li className="flex flex-col items-center hover:text-black cursor-pointer">
-    <Link to="/products" className="flex flex-col items-center">
-      <FaShoppingCart size={24} />
-      <span>Sản phẩm</span>
-    </Link>
-  </li>
-  <li className="flex flex-col items-center hover:text-black cursor-pointer">
-    <Link to="/news" className="flex flex-col items-center">
-      <MdLocalMovies size={24} />
-      <span>Điện ảnh</span>
-    </Link>
-  </li>
-  <li className="flex flex-col items-center hover:text-black cursor-pointer">
-    <Link to="/account" className="flex flex-col items-center">
-      <FaUser size={24} />
-      <span>Tài khoản</span>
-    </Link>
-  </li>
-</ul>
-        </nav>
-      </footer>
-    </div>
+    <footer className="fixed z-10 bottom-0 left-0 right-0 bg-white shadow-lg pb-4 pt-2">
+      <nav>
+        <ul className="flex justify-around text-gray-500 text-sm">
+          {navItems.map((item) => (
+            <li key={item.path} className="flex flex-col items-center hover:text-black">
+              <Link to={item.path} className="flex flex-col items-center">
+                {item.icon}
+                <span className={`${current === item.path ? "text-orange-600 font-semibold" : ""}`}>
+                  {item.label}
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </footer>
   );
 }
 
