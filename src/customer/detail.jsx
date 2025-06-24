@@ -7,23 +7,48 @@ function Detail() {
   const [movie, setMovie] = useState(null);
   const [activeTab, setActiveTab] = useState("showtimeMo");
   const [showtimeMo, setShowtimeMo] = useState([]);
+  const [activeCinema, setActiveCinema] = useState('');
+  const [selectedDate, setSelectedDate] = useState('');
   const BASE_URL = 'http://localhost:5000/';
 
   useEffect(() => {
     axios.get(`${BASE_URL}api/movies/${id}`)
       .then(res => {
+        console.log("Lấy từ /movies:", res.data);
         setMovie(res.data);
         setShowtimeMo(res.data.showtimeMo || []);
       })
       .catch(() => {
         axios.get(`${BASE_URL}api/comingsoon/${id}`)
           .then(res => {
+            console.log("Lấy từ /comingsoon:", res.data);
             setMovie(res.data);
             setShowtimeMo(res.data.showtimeMo || []);
           })
           .catch(err => console.error('Không tìm thấy phim:', err));
       });
   }, [id]);
+
+  useEffect(() => {
+    if (showtimeMo.length > 0) {
+      setActiveCinema(showtimeMo[0].cinema);
+      setSelectedDate(showtimeMo[0].date);
+    }
+  }, [showtimeMo]);
+
+  const getNext7Days = () => {
+    const days = [];
+    const today = new Date();
+    for (let i = 0; i < 7; i++) {
+      const date = new Date();
+      date.setDate(today.getDate() + i);
+      days.push({
+        label: date.toLocaleDateString('vi-VN', { weekday: 'short', day: '2-digit', month: '2-digit' }),
+        value: date.toISOString().split('T')[0]
+      });
+    }
+    return days;
+  };
 
   if (!movie) {
     return <div className="text-center mt-10">Đang tải thông tin phim...</div>;
@@ -34,9 +59,9 @@ function Detail() {
       <h1 className="text-3xl font-bold mb-4 text-center">{movie.nameMo}</h1>
 
       {/* Tabs */}
-      <div className="flex justify-between items-center px-4">
-        <div className="flex space-x-4">
-          {["showtimeMo", "infoMo", "news"].map(tab => (
+      <div className="flex justify-center items-center px-4">
+        <div className="flex space-x-4 ">
+          {['showtimeMo', 'infoMo', 'news'].map(tab => (
             <div
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -51,37 +76,67 @@ function Detail() {
       {/* Tab Content */}
       <div className="mt-4 px-4">
         {activeTab === "showtimeMo" && (
-  <div className="mt-4 space-y-6">
-    {showtimeMo.length === 0 ? (
-      <p className="text-center text-gray-500">Chưa có thông tin suất chiếu.</p>
-    ) : (
-      showtimeMo.map((entry, idx) => (
-        <div key={idx} className="border border-gray-300 rounded-lg p-4 bg-white shadow">
-          <h3 className="text-lg font-semibold text-blue-700">{entry.cinema}</h3>
-          <p className="text-sm text-gray-600 mb-2">📅 Ngày chiếu: {entry.date}</p>
-
-          {Array.isArray(entry.times) && entry.times.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-2">
-              {entry.times.map((timeObj, timeIdx) => (
-                <div key={timeIdx} className="border rounded-lg p-3 bg-gray-50 hover:bg-blue-50 transition">
-                  <p className="font-semibold text-black">⏰ {timeObj.time}</p>
-                  <p className="text-sm text-gray-700">Phòng: {timeObj.room}</p>
-                  <p className="text-sm text-gray-700">Định dạng: {timeObj.format}</p>
-                  <p className="text-sm text-red-500 font-semibold">
-                    Giá: {timeObj.price.toLocaleString()}đ
-                  </p>
-                </div>
+          <div className="space-y-6">
+            {/* Dãy button chọn ngày */}
+            <div className="flex gap-2 overflow-x-auto mb-4">
+              {getNext7Days().map((day, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setSelectedDate(day.value)}
+                  className={`px-4 py-2  rounded ${selectedDate === day.value ? 'bg-blue-500 text-white' : 'bg-white'}`}
+                >
+                  {day.label}
+                </button>
               ))}
             </div>
-          ) : (
-            <p className="text-sm text-gray-500">Không có giờ chiếu.</p>
-          )}
-        </div>
-      ))
-    )}
-  </div>
-)}
 
+            {/* Dropdown cinema */}
+            <div className="mb-4 ">
+              <select
+  value={activeCinema}
+  onChange={e => setActiveCinema(e.target.value)}
+  className="bg-white border border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+>
+  {showtimeMo.map((entry, idx) => (
+    <option key={idx} value={entry.cinema}>
+      {entry.cinema}
+    </option>
+  ))}
+</select>
+
+            </div>
+
+            {/* Giờ chiếu theo rạp và nhóm theo format */}
+            {showtimeMo
+              .filter(entry => entry.cinema === activeCinema && entry.date === selectedDate)
+              .map((entry, idx) => (
+                <div key={idx} className="bg-white p-4 rounded shadow">
+                  <p className="text-sm text-gray-600 mb-2">📅 Ngày chiếu: {entry.date}</p>
+                  {Object.entries(
+                    entry.times.reduce((acc, time) => {
+                      if (!acc[time.format]) acc[time.format] = [];
+                      acc[time.format].push(time);
+                      return acc;
+                    }, {})
+                  ).map(([format, times], fIdx) => (
+                    <div key={fIdx} className="mb-4">
+                      <h3 className="text-blue-700 font-semibold mb-1">{format}</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {times.map((t, i) => (
+                          <div
+                            key={i}
+                            className="px-3 py-1 border rounded bg-gray-100 hover:bg-blue-100 transition"
+                          >
+                            {t.time}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ))}
+          </div>
+        )}
 
         {activeTab === "infoMo" && (
           <div className="bg-white p-4 rounded-lg shadow">
@@ -115,7 +170,6 @@ function Detail() {
               </div>
             </div>
 
-            {/* Bình luận */}
             {movie.infoMo?.comments?.length > 0 && (
               <div className="mt-6">
                 <h2 className="text-lg font-semibold mb-2">Bình luận</h2>

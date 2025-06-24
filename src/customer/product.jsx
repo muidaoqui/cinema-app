@@ -62,12 +62,14 @@ function Product() {
     ]
   };
 
-  const discountSliderSettings = {
-    dots: false,
-    infinite: false,
-    speed: 500,
+  const sliderSettings = {
+    dots: true,
+    infinite: true,
+    speed: 800,
     slidesToShow: 3,
     slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 3000,
     arrows: true,
     responsive: [
       { breakpoint: 1024, settings: { slidesToShow: 3 }},
@@ -117,7 +119,7 @@ function Product() {
 
       {/* Discount slider */}
       <div className="px-4 my-8">
-        <Slider {...discountSliderSettings}>
+        <Slider {...sliderSettings}>
           {discounts.map((discount, index) => (
             <div key={index} className="px-2">
               <div className="relative rounded overflow-hidden shadow">
