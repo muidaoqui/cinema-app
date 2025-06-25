@@ -8,6 +8,7 @@ import News from './customer/news';
 import Account from './customer/account';
 import Navbar from './customer/navbar';
 import Detail from './customer/detail';
+import SeatSelector from './customer/seatselector'; 
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path="/news" element={<News />} />
           <Route path="/detail/:id" element={<Detail />} />
           <Route path="/account" element={<Account />} />
+          <Route path="/seatselector/:id" element={<SeatSelector />} />
         </Routes>
         <Navbar />
       </div>

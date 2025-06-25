@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
-
+import SeatSelector from './seatselector';
 function Detail() {
   const { id } = useParams();
   const [movie, setMovie] = useState(null);
@@ -9,6 +9,7 @@ function Detail() {
   const [showtimeMo, setShowtimeMo] = useState([]);
   const [activeCinema, setActiveCinema] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
+  const [selectedShowtime, setSelectedShowtime] = useState(null);
   const BASE_URL = 'http://localhost:5000/';
 
   useEffect(() => {
@@ -54,28 +55,45 @@ function Detail() {
     return <div className="text-center mt-10">Đang tải thông tin phim...</div>;
   }
 
+  
+
+  const handleSelectShowtime = (cinema, date, timeObj) => {
+  setSelectedShowtime({
+    cinema,
+    date,
+    ...timeObj 
+  });
+};
+
   return (
-    <div className="max-w-4xl mx-auto p-4 mb-20">
-      <h1 className="text-3xl font-bold mb-4 text-center">{movie.nameMo}</h1>
+  <div className="max-w-4xl mx-auto p-4 mb-20">
+    <h1 className="text-3xl font-bold mb-4 text-center">{movie.nameMo}</h1>
 
-      {/* Tabs */}
-      <div className="flex justify-center items-center px-4">
-        <div className="flex space-x-4 ">
-          {['showtimeMo', 'infoMo', 'news'].map(tab => (
-            <div
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`cursor-pointer pb-2 ${activeTab === tab ? "border-b-2 border-blue-500 font-semibold" : ""}`}
-            >
-              {tab === "showtimeMo" ? "Suất chiếu" : tab === "infoMo" ? "Thông tin" : "Tin tức"}
-            </div>
-          ))}
-        </div>
+    {/* Tabs */}
+    <div className="flex justify-center items-center px-4">
+      <div className="flex space-x-4 ">
+        {['showtimeMo', 'infoMo', 'news'].map(tab => (
+          <div
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`cursor-pointer pb-2 ${activeTab === tab ? "border-b-2 border-blue-500 font-semibold" : ""}`}
+          >
+            {tab === "showtimeMo" ? "Suất chiếu" : tab === "infoMo" ? "Thông tin" : "Tin tức"}
+          </div>
+        ))}
       </div>
+    </div>
 
-      {/* Tab Content */}
-      <div className="mt-4 px-4">
-        {activeTab === "showtimeMo" && (
+    {/* Tab Content */}
+    <div className="mt-4 px-4">
+      {activeTab === "showtimeMo" && (
+        selectedShowtime ? (
+          <SeatSelector
+            showtime={selectedShowtime}
+            movieName={movie.nameMo}
+            onBack={() => setSelectedShowtime(null)}
+          />
+        ) : (
           <div className="space-y-6">
             {/* Dãy button chọn ngày */}
             <div className="flex gap-2 overflow-x-auto mb-4">
@@ -83,30 +101,29 @@ function Detail() {
                 <button
                   key={idx}
                   onClick={() => setSelectedDate(day.value)}
-                  className={`px-4 py-2  rounded ${selectedDate === day.value ? 'bg-blue-500 text-white' : 'bg-white'}`}
+                  className={`px-4 py-2 rounded ${selectedDate === day.value ? 'bg-blue-500 text-white' : 'bg-white'}`}
                 >
                   {day.label}
                 </button>
               ))}
             </div>
 
-            {/* Dropdown cinema */}
-            <div className="mb-4 ">
+            {/* Dropdown chọn rạp */}
+            <div className="mb-4">
               <select
-  value={activeCinema}
-  onChange={e => setActiveCinema(e.target.value)}
-  className="bg-white border border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
->
-  {showtimeMo.map((entry, idx) => (
-    <option key={idx} value={entry.cinema}>
-      {entry.cinema}
-    </option>
-  ))}
-</select>
-
+                value={activeCinema}
+                onChange={e => setActiveCinema(e.target.value)}
+                className="bg-white border border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+              >
+                {showtimeMo.map((entry, idx) => (
+                  <option key={idx} value={entry.cinema}>
+                    {entry.cinema}
+                  </option>
+                ))}
+              </select>
             </div>
 
-            {/* Giờ chiếu theo rạp và nhóm theo format */}
+            {/* Giờ chiếu */}
             {showtimeMo
               .filter(entry => entry.cinema === activeCinema && entry.date === selectedDate)
               .map((entry, idx) => (
@@ -125,9 +142,10 @@ function Detail() {
                         {times.map((t, i) => (
                           <div
                             key={i}
-                            className="px-3 py-1 border rounded bg-gray-100 hover:bg-blue-100 transition"
+                            onClick={() => handleSelectShowtime(entry.cinema, entry.date, t)}
+                            className="cursor-pointer px-3 py-1 border rounded bg-gray-100 hover:bg-blue-100 transition"
                           >
-                            {t.time}
+                            {t.time} – Phòng {t.room}
                           </div>
                         ))}
                       </div>
@@ -136,74 +154,76 @@ function Detail() {
                 </div>
               ))}
           </div>
-        )}
+        )
+      )}
 
-        {activeTab === "infoMo" && (
-          <div className="bg-white p-4 rounded-lg shadow">
-            <h2 className="text-xl font-semibold mb-2">Nội dung</h2>
-            <p className="text-gray-700 mb-4">{movie.infoMo?.content || 'Chưa có nội dung.'}</p>
+      {activeTab === "infoMo" && (
+        <div className="bg-white p-4 rounded-lg shadow">
+          <h2 className="text-xl font-semibold mb-2">Nội dung</h2>
+          <p className="text-gray-700 mb-4">{movie.infoMo?.content || 'Chưa có nội dung.'}</p>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
-              <div>
-                <h3 className="font-semibold">Đạo diễn:</h3>
-                <p>{movie.infoMo?.director}</p>
-              </div>
-              <div>
-                <h3 className="font-semibold">Diễn viên:</h3>
-                <ul className="list-disc list-inside">
-                  {movie.infoMo?.actor?.map((actor, idx) => <li key={idx}>{actor}</li>)}
-                </ul>
-              </div>
-              <div>
-                <h3 className="font-semibold">Rạp chiếu:</h3>
-                <ul className="list-disc list-inside">
-                  {movie.cinemaMo?.map((cinema, idx) => <li key={idx}>{cinema}</li>)}
-                </ul>
-              </div>
-              <div>
-                <h3 className="font-semibold">Đánh giá:</h3>
-                <p>⭐ {movie.ratingMo} / 10</p>
-              </div>
-              <div>
-                <h3 className="font-semibold">Độ tuổi:</h3>
-                <p>⛔ {movie.agelimitMo}+ tuổi</p>
-              </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
+            <div>
+              <h3 className="font-semibold">Đạo diễn:</h3>
+              <p>{movie.infoMo?.director}</p>
             </div>
-
-            {movie.infoMo?.comments?.length > 0 && (
-              <div className="mt-6">
-                <h2 className="text-lg font-semibold mb-2">Bình luận</h2>
-                <ul className="list-disc list-inside text-gray-600">
-                  {movie.infoMo.comments.map((cmt, idx) => (
-                    <li key={idx}>{cmt}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
+            <div>
+              <h3 className="font-semibold">Diễn viên:</h3>
+              <ul className="list-disc list-inside">
+                {movie.infoMo?.actor?.map((actor, idx) => <li key={idx}>{actor}</li>)}
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-semibold">Rạp chiếu:</h3>
+              <ul className="list-disc list-inside">
+                {movie.cinemaMo?.map((cinema, idx) => <li key={idx}>{cinema}</li>)}
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-semibold">Đánh giá:</h3>
+              <p>⭐ {movie.ratingMo} / 10</p>
+            </div>
+            <div>
+              <h3 className="font-semibold">Độ tuổi:</h3>
+              <p>⛔ {movie.agelimitMo}+ tuổi</p>
+            </div>
           </div>
-        )}
 
-        {activeTab === "news" && (
-          <div className="bg-white p-4 rounded-lg shadow">
-            <h2 className="text-xl font-semibold mb-2">Tin tức</h2>
-            <p>{movie.newsMo || "Chưa có tin tức."}</p>
-          </div>
-        )}
-      </div>
+          {movie.infoMo?.comments?.length > 0 && (
+            <div className="mt-6">
+              <h2 className="text-lg font-semibold mb-2">Bình luận</h2>
+              <ul className="list-disc list-inside text-gray-600">
+                {movie.infoMo.comments.map((cmt, idx) => (
+                  <li key={idx}>{cmt}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
 
-      {/* Hình ảnh phim */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 mt-6">
-        {movie.infoMo?.somePic?.map((img, idx) => (
-          <img
-            key={idx}
-            src={img}
-            alt={`movie-${idx}`}
-            className="w-full h-60 object-cover rounded-lg shadow"
-          />
-        ))}
-      </div>
+      {activeTab === "news" && (
+        <div className="bg-white p-4 rounded-lg shadow">
+          <h2 className="text-xl font-semibold mb-2">Tin tức</h2>
+          <p>{movie.newsMo || "Chưa có tin tức."}</p>
+        </div>
+      )}
     </div>
-  );
+
+    {/* Hình ảnh phim */}
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 mt-6">
+      {movie.infoMo?.somePic?.map((img, idx) => (
+        <img
+          key={idx}
+          src={img}
+          alt={`movie-${idx}`}
+          className="w-full h-60 object-cover rounded-lg shadow"
+        />
+      ))}
+    </div>
+  </div>
+);
+
 }
 
 export default Detail;
