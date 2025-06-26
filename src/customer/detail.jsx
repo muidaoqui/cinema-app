@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import SeatSelector from './seatselector';
+import { useNavigate } from 'react-router-dom';
+
 function Detail() {
   const { id } = useParams();
   const [movie, setMovie] = useState(null);
@@ -10,6 +12,8 @@ function Detail() {
   const [activeCinema, setActiveCinema] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedShowtime, setSelectedShowtime] = useState(null);
+  const navigate = useNavigate();
+
   const BASE_URL = 'http://localhost:5000/';
 
   useEffect(() => {
@@ -58,12 +62,19 @@ function Detail() {
   
 
   const handleSelectShowtime = (cinema, date, timeObj) => {
-  setSelectedShowtime({
+  const fullShowtime = {
+    ...timeObj,
     cinema,
     date,
-    ...timeObj 
-  });
+    agelimit: movie.agelimitMo,
+    nameMo: movie.nameMo,
+    somePic: movie.infoMo?.somePic || []
+  };
+  
+  navigate('/bookticket', { state: fullShowtime });
 };
+
+
 
   return (
   <div className="max-w-4xl mx-auto p-4 mb-20">
@@ -90,7 +101,13 @@ function Detail() {
         selectedShowtime ? (
           <SeatSelector
             showtime={selectedShowtime}
-            movieName={movie.nameMo}
+            movieName={selectedShowtime.nameMo}
+            agelimit={selectedShowtime.agelimit}
+            cinema={selectedShowtime.cinema}
+            format={selectedShowtime.format}
+            room={selectedShowtime.room}
+            date={selectedShowtime.date}
+            somePic={selectedShowtime.somePic}
             onBack={() => setSelectedShowtime(null)}
           />
         ) : (
