@@ -1,135 +1,99 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-function SeatSelector({ showtime, movieName, agelimit, cinema, format, onBack }) {
-
-  const [seatMap, setSeatMap] = useState(null);
+function SeatSelector({ showtime, movieName, onBack }) {
   const [selectedSeats, setSelectedSeats] = useState([]);
-
-  const BASE_URL = 'http://localhost:5000/';
+  const [seatMap, setSeatMap] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (showtime.seatMapId) {
-      axios.get(`${BASE_URL}api/seatmaps/${showtime.seatMapId?._id || showtime.seatMapId}`)
-        .then(res => setSeatMap(res.data))
-        .catch(err => console.error('Lỗi lấy sơ đồ ghế:', err));
+      fetch(`http://localhost:5000/api/seatmaps/${showtime.seatMapId}`)
+        .then(res => res.json())
+        .then(data => setSeatMap(data))
+        .catch(err => console.error(err));
     }
   }, [showtime.seatMapId]);
 
-  const toggleSeat = (seatCode) => {
+  const toggleSeat = (seat) => {
+    if (seat.booked) return;
     setSelectedSeats(prev =>
-      prev.includes(seatCode)
-        ? prev.filter(code => code !== seatCode)
-        : [...prev, seatCode]
+      prev.includes(seat.id)
+        ? prev.filter(s => s !== seat.id)
+        : [...prev, seat.id]
     );
   };
 
-  const getSeatStyle = (type, selected) => {
-    let base = "w-6 h-8 flex items-center justify-center rounded cursor-pointer text-sm font-semibold";
-    let color = {
-      regular: "bg-gray-300 hover:bg-gray-400",
-      vip: "bg-yellow-300 hover:bg-yellow-400",
-      screenfront: "bg-red-300 hover:bg-red-400"
-    }[type] || "bg-gray-200";
-
-    let selectedStyle = selected ? "ring-2 ring-blue-500" : "";
-    return `${base} ${color} ${selectedStyle}`;
+  const getSeatClass = (seat) => {
+    if (seat.booked) return "bg-gray-400";
+    if (selectedSeats.includes(seat.id)) return "bg-red-500";
+    return "bg-gray-200 hover:bg-gray-300";
   };
 
-  const seatPrices = {
-  regular: 70000,
-  vip: 100000,
-  screenfront: 50000
-};
-  const totalPrice = selectedSeats.reduce((sum, seatCode) => {
-  const [rowLetter, ...rest] = seatCode; // ví dụ A3 → row=A, seatId=3
-  const rowData = seatMap.layout.find(r => r.row === rowLetter);
-  const seatData = rowData?.seats.find(s => `${rowLetter}${s.id}` === seatCode);
-  if (!seatData) return sum;
-  return sum + seatPrices[seatData.type] || 0;
-}, 0);
+  const totalPrice = selectedSeats.length * (seatMap?.price || 100);
 
+  const handleConfirm = () => {
+    navigate('/bookticket', {
+      state: {
+        ...showtime,
+        selectedSeats
+      }
+    });
+  };
 
   if (!seatMap) return <div className="text-center py-10">Đang tải sơ đồ ghế...</div>;
 
   return (
-    <div className="bg-white  rounded shadow my-8">
-      <div className=' text-center'>
-        <div className="flex justify-between mb-4">
-          {/* Nút quay lại */}
-          <button
-            onClick={onBack}
-            className="w-1/6 border border-blue-300 px-4 hover:bg-gray-300 rounded"
-          >
-            ← 
-          </button>
-          <h2 className="text-3xl font-bold mb-4">{showtime.cinema}</h2>
-        </div>
-        <div className='flex justify-between'>
-          <p>{format} <span className="text-l  text-white border px-4 py-2 bg-orange-400 ml-4">{agelimit}+</span></p>
-          <label className='border px-4 py-2'>{showtime.time}</label>
-        </div>
-        
-      </div>
+    <div className="flex flex-col items-center p-4 space-y-6">
+      {/* Mô phỏng màn hình */}
+      <div className="w-40 h-2 bg-red-300 rounded-full my-2"></div>
 
-      <div className="text-center text-xl font-semibold my-4 border-b pb-4 border-orange-300">
-        Màn hình
-      </div>
-
-      {/* Ghế */}
-      <div className="space-y-3 my-6">
-        {seatMap.layout.map((rowObj, rowIdx) => (
-          <div key={rowIdx} className="flex items-center gap-2">
-            <span className="w-6 text-right font-medium">{rowObj.row}</span>
-            <div className="flex gap-2">
-              {rowObj.seats.map((seat, idx) => {
-                const seatCode = `${seat.id}`;
-                return (
-                  <div
-                    key={idx}
-                    className={getSeatStyle(seat.type, selectedSeats.includes(seatCode))}
-                    onClick={() => toggleSeat(seatCode)}
-                  >
-                    {seat.id}
-                  </div>
-                );
-              })}
+      {/* Sơ đồ ghế */}
+      <div className="grid grid-cols-10 gap-2">
+        {seatMap.layout.flatMap((row, rowIdx) =>
+          row.seats.map((seat, colIdx) => (
+            <div
+              key={seat.id}
+              className={`w-6 h-6 rounded ${getSeatClass(seat)} text-[10px] text-white flex items-center justify-center`}
+              onClick={() => toggleSeat(seat)}
+            >
+              {seat.id}
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
 
-      {/* Chú thích */}
-      <div className="flex gap-4 mb-4 text-sm w-full">
-        <div className="flex items-center gap-1 w-1/4">
-          <div className="w-5 h-5 bg-gray-300 rounded" /> Thường
+      {/* Ghi chú trạng thái */}
+      <div className="flex justify-center gap-4 text-xs">
+        <div className="flex items-center gap-1">
+          <div className="w-4 h-4 bg-red-500 rounded"></div> Selected
         </div>
-        <div className="flex items-center gap-1 w-1/4">
-          <div className="w-5 h-5 bg-yellow-300 rounded" /> VIP
+        <div className="flex items-center gap-1">
+          <div className="w-4 h-4 bg-gray-400 rounded"></div> Booked
         </div>
-        <div className="flex items-center gap-1 w-1/4">
-          <div className="w-5 h-5 bg-red-300 rounded" /> Gần, xa
-        </div>
-        <div className="flex items-center gap-1 w-1/4">
-          <div className="w-5 h-5 bg-white border border-blue-500 rounded" /> Đã chọn
+        <div className="flex items-center gap-1">
+          <div className="w-4 h-4 bg-gray-200 rounded border"></div> Available
         </div>
       </div>
-      {/* Tổng tiền */}
-      <div className='flex justify-between p-4'>
-        <div className="mt-4  font-semibold text-lg">
-          <p className="text-gray-600">
-            {selectedSeats.length} ghế: {selectedSeats.join(", ")}
-          </p>
-          <p>Tổng tiền: <span className="text-blue-600">{totalPrice.toLocaleString()}đ</span></p>
-        </div>
-        <div className="flex items-center">
-          <button
-            disabled={selectedSeats.length === 0}
-            className={`px-6 py-2 rounded bg-orange-400 text-white font-semibold ${selectedSeats.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
-          >
-            Đặt vé
-          </button>
-        </div>
+
+      {/* Thời gian */}
+      <div className="bg-gray-100 w-full rounded-lg p-4 text-center">
+        <h3 className="font-semibold">Chọn ngày & giờ</h3>
+        <p className="text-sm mt-1">{showtime.date} - {showtime.time}</p>
+      </div>
+
+      {/* Tổng tiền + nút xác nhận */}
+      <div className="w-full text-center">
+        <p className="text-lg font-bold text-gray-700">Total Price: ${totalPrice.toFixed(2)}</p>
+        <button
+          onClick={handleConfirm}
+          disabled={selectedSeats.length === 0}
+          className={`w-full mt-3 py-3 rounded-lg text-white text-sm font-bold ${
+            selectedSeats.length ? "bg-red-500" : "bg-gray-300 cursor-not-allowed"
+          }`}
+        >
+          Confirm Seat
+        </button>
       </div>
     </div>
   );
