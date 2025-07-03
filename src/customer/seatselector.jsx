@@ -30,16 +30,27 @@ function SeatSelector({ showtime, movieName, onBack }) {
     return "bg-gray-200 hover:bg-gray-300";
   };
 
-  const totalPrice = selectedSeats.length * (seatMap?.price || 100);
+  const seatPrices = {
+  regular: 80000,
+  vip: 120000,
+  screenfront: 60000
+};
 
-  const handleConfirm = () => {
-    navigate('/bookticket', {
-      state: {
-        ...showtime,
-        selectedSeats
-      }
-    });
-  };
+const totalPrice = selectedSeats.reduce((total, seatId) => {
+  const seat = seatMap.layout.flatMap(r => r.seats).find(s => s.id === seatId);
+  return total + (seatPrices[seat?.type] || 0);
+}, 0);
+
+const handleConfirm = () => {
+  navigate('/bookticket', {
+    state: {
+      ...showtime,
+      selectedSeats,
+      totalPrice 
+    }
+  });
+};
+
 
   if (!seatMap) return <div className="text-center py-10">Đang tải sơ đồ ghế...</div>;
 
@@ -78,13 +89,13 @@ function SeatSelector({ showtime, movieName, onBack }) {
 
       {/* Thời gian */}
       <div className="bg-gray-100 w-full rounded-lg p-4 text-center">
-        <h3 className="font-semibold">Chọn ngày & giờ</h3>
+        <h3 className="font-semibold">Lịch chiếu</h3>
         <p className="text-sm mt-1">{showtime.date} - {showtime.time}</p>
       </div>
 
       {/* Tổng tiền + nút xác nhận */}
       <div className="w-full text-center">
-        <p className="text-lg font-bold text-gray-700">Total Price: ${totalPrice.toFixed(2)}</p>
+        <p className="text-lg font-bold text-gray-700">Tổng Cộng: {totalPrice}đ</p>
         <button
           onClick={handleConfirm}
           disabled={selectedSeats.length === 0}
