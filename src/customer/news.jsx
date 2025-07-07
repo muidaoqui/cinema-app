@@ -7,54 +7,59 @@ function News() {
 
   useEffect(() => {
     fetch(`${BASE_URL}api/news`)
-      .then(response => response.json())
-      .then(data => {
+      .then((response) => response.json())
+      .then((data) => {
         console.log('News data:', data);
         setNews(data);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error fetching news data:', error);
       });
   }, []);
 
-  const filteredNews = news.filter(item =>
+  const filteredNews = news.filter((item) =>
     item.nameNews.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
-    <div className='mb-20'>
-      <div className="bg-white">
-        <h1 className="text-2xl font-bold text-center mt-4">Điện ảnh</h1>
-        <div className="flex justify-center mt-4 mb-4">
-          <input
-            type="text"
-            placeholder="Tìm kiếm"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-gray-100 p-2 border border-gray-300 rounded-lg mx-4"
-          />
-        </div>
+    <div className="min-h-screen py-10 px-4 bg-gray-50">
+      <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">🎬 Tin tức Điện ảnh</h1>
+
+      <div className="flex justify-center mb-8">
+        <input
+          type="text"
+          placeholder="🔍 Nhập tên bài viết..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full max-w-xl px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent transition"
+        />
       </div>
 
-      <div className="flex flex-col gap-4 shadow-3xl bg-gray-300 p-4">
-        {filteredNews.map((item) => (
-          <div
-            key={item._id}
-            className="w-full flex flex-col border bg-white rounded hover:shadow-lg transition duration-300"
-          >
-            <img
-              src={item.imagesNews[0]}
-              alt={item.nameNews}
-              className="w-full max-h-60 object-cover rounded-t-lg"
-            />
-            <div className="p-2">
-              <h2 className="text-lg font-semibold">{item.nameNews}</h2>
-              <button className="text-orange-600 mt-2 hover:underline">
-                Xem thêm
-              </button>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredNews.length > 0 ? (
+          filteredNews.map((item) => (
+            <div
+              key={item._id}
+              className="bg-white rounded-xl shadow-md hover:shadow-xl transition duration-300 flex flex-col overflow-hidden"
+            >
+              <img
+                src={item.imagesNews[0]}
+                alt={item.nameNews}
+                className="w-full h-48 object-cover"
+              />
+              <div className="p-4 flex-1 flex flex-col justify-between">
+                <h2 className="text-lg font-semibold text-gray-800 line-clamp-2">{item.nameNews}</h2>
+                <button className="mt-4 text-orange-600 hover:underline self-start transition">
+                  Xem thêm →
+                </button>
+              </div>
             </div>
+          ))
+        ) : (
+          <div className="col-span-full text-center text-gray-500 text-lg">
+            😢 Không tìm thấy kết quả phù hợp.
           </div>
-        ))}
+        )}
       </div>
     </div>
   );
