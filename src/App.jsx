@@ -74,9 +74,12 @@
 
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Home from './manager/home';
-import Movies from './manager/movies';
-import Products from './manager/products';
+import Home from './manager/homepos';
+import Movies from './manager/moviespos';
+import Products from './manager/productspos';
+import MovieDetails from './manager/moviedetails';  
+import SeatSelectorPOS from './manager/seatselectorpos';
+import ConfirmPOS from './manager/confirmpos';
 
 function App() {
   return (
@@ -86,6 +89,9 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/movies" element={<Movies />} />
           <Route path="/products" element={<Products />} /> 
+          <Route path="/moviedetails/:movieId" element={<MovieDetails />} />
+          <Route path="/seatselector" element={<SeatSelectorPOS />} />
+          <Route path="/confirmpos" element={<ConfirmPOS />} />
           {/* Thêm các route khác nếu cần */}
         </Routes>
       </div>
