@@ -10,7 +10,8 @@ import Navbar from './customer/navbar';
 import Detail from './customer/detail';
 import SeatSelector from './customer/seatselector'; 
 import BookTicket from './customer/bookticket';
-
+import EditProfile from './customer/editprofile';
+import Login from './customer/login';
 function App() {
   return (
     <Router>
@@ -24,7 +25,8 @@ function App() {
           <Route path="/account" element={<Account />} />
           <Route path="/seatselector/:id" element={<SeatSelector />} />
           <Route path="/bookticket" element={<BookTicket />} />
-
+          <Route path="/edit-profile" element={<EditProfile />} />
+          <Route path="/login" element={<Login />} />
         </Routes>
         <Navbar />
       </div>
