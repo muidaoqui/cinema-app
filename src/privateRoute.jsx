@@ -7,7 +7,7 @@ function PrivateRoute({ children, allowedRoles }) {
     return <Navigate to="/login" />;
   }
 
-  const userRole = storedUser.role?.[0];
+  const userRole = storedUser.role;
 
   // Nếu role không phù hợp
   if (!allowedRoles.includes(userRole)) {

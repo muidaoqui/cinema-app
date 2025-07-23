@@ -4,61 +4,59 @@ import { FaEnvelope, FaArrowLeft, FaGoogle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 function Login() {
+  const BASE_URL = "http://localhost:5000";
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  // Gửi OTP sau khi kiểm tra email
   const handleSendOTP = async () => {
     try {
-      await axios.post("http://localhost:5000/api/check-email", { email }); // kiểm tra email có tồn tại (nếu chưa thì backend tạo mới user luôn)
-      await axios.post("http://localhost:5000/api/email/send-otp", { email }); // gửi mã OTP
-      setStep(2);
-      setError("");
+      const response = await axios.post(`${BASE_URL}/api/email/send-otp`, { email });
+      if (response.data.success) {
+        setStep(2);
+        setError("");
+      } else {
+        setError(response.data.message || "Không thể gửi OTP.");
+      }
     } catch (err) {
-      setError("Lỗi khi gửi mã OTP. Vui lòng thử lại.");
+      setError("Lỗi khi gửi OTP.");
     }
   };
 
-  // Xác minh OTP
-  const handleVerifyOtp = async () => {
-  try {
-    const res = await axios.post("http://localhost:5000/api/email/verify-otp", { email, otp });
+  const handleVerifyOTP = async () => {
+    try {
+      const response = await axios.post(`${BASE_URL}/api/email/verify-otp`, { email, otp });
+      if (response.data.success) {
+        const user = response.data.user;
+        localStorage.setItem("user", JSON.stringify(user));
 
-    if (res.status === 200) {
-      const userRes = await axios.post("http://localhost:5000/api/check-email", { email });
-      console.log("✅ User info trả về:", userRes.data); // <== kiểm tra dữ liệu trả về
+        if (user.role.includes("Admin")) {
+  navigate("/admin/home");
+} else if (user.role.includes("Manager")) {
+  navigate("/manager/home");
+} else if (user.role.includes("Customer")) {
+  navigate("/home");
+} else {
+  setError("Không xác định được vai trò.");
+}
 
-      const user = userRes.data;
-      const role = user.role?.[0];
-      localStorage.setItem("user", JSON.stringify(user));
-
-      if (role === "Admin") navigate("/admin/home");
-      else if (role === "Manager") navigate("/manager/home");
-      else if (role === "Customer") navigate("/home");
-      else navigate("/login");
+      } else {
+        setError(response.data.message || "OTP không chính xác.");
+      }
+    } catch (err) {
+      setError("Lỗi khi xác minh OTP.");
     }
-  } catch (err) {
-    setError("Mã OTP sai hoặc đã hết hạn.");
-  }
-};
-
-
-  const handleBack = () => {
-    setStep(1);
-    setOtp("");
-    setError("");
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-100 via-orange-200 to-yellow-100 px-4">
-      <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-2xl h-full">
+      <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-2xl">
         <h2 className="text-2xl font-bold text-center text-red-500 mb-6">Đăng nhập / Đăng ký</h2>
 
         {step === 2 && (
-          <button onClick={handleBack} className="mb-4 text-gray-500 hover:text-red-500 flex items-center gap-2">
+          <button onClick={() => setStep(1)} className="mb-4 text-gray-500 hover:text-red-500 flex items-center gap-2">
             <FaArrowLeft /> Quay lại
           </button>
         )}
@@ -97,7 +95,7 @@ function Login() {
               className="w-full py-2 px-3 border rounded-lg mb-4"
             />
             <button
-              onClick={handleVerifyOtp}
+              onClick={handleVerifyOTP}
               disabled={!otp}
               className="w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg font-semibold disabled:opacity-50"
             >
