@@ -23,7 +23,7 @@ function Discount() {
   }, []);
 
   return (
-    <div className="flex-grow w-5/6 float-right">
+    <div className="flex-grow p-4">
       <Table
         dataSource={data}
         className="bg-white dark:bg-gray-700 rounded-lg shadow-md overflow-hidden"

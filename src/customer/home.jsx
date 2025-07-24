@@ -4,6 +4,7 @@ import axios from 'axios';
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import Navbar from './navbar';
 
 function Home() {
   const [images, setImages] = useState([]);
@@ -60,7 +61,7 @@ function Home() {
   }, []);
 
   const handleMovieClick = (id) => {
-    navigate(`/detail/${id}`);
+    navigate(`/customer/detail/${id}`);
   };
 
   return (
@@ -145,6 +146,10 @@ function Home() {
           ))}
         </Slider>
       </div>
+      {/* NAVBAR */}
+      <Navbar />
+
+      {/* Footer */}
     </div>
   );
 }

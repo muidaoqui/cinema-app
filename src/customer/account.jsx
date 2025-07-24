@@ -16,7 +16,7 @@ function Account() {
     } else {
       navigate("/login"); // Nếu chưa login, chuyển về login
     }
-  }, []);
+  }, [navigate]);
 
   const handleLogout = () => {
     localStorage.removeItem("user");
@@ -24,8 +24,8 @@ function Account() {
   };
 
   const menuItems = [
-    { icon: <FaUserEdit />, label: "Chỉnh sửa thông tin", onClick: () => navigate('/edit-profile') },
-    { icon: <FaTicketAlt />, label: "Vé đã mua", onClick: () => console.log("My Tickets") },
+    { icon: <FaUserEdit />, label: "Chỉnh sửa thông tin", onClick: () => navigate('/customer/edit-profile') },
+    { icon: <FaTicketAlt />, label: "Vé đã mua", onClick: () => navigate('/customer/my-tickets') },
     { icon: <FaLock />, label: "Thay đổi mật khẩu", onClick: () => console.log("Change Password") },
     { icon: <FaShieldAlt />, label: "Chính sách bảo mật", onClick: () => console.log("Privacy Policy") },
     { icon: <FaFileContract />, label: "Điều khoản", onClick: () => console.log("Terms & Conditions") },
@@ -64,7 +64,7 @@ function Account() {
         </div>
         <div className="flex flex-col items-center gap-2">
           <FaBarcode size={20} />
-          <p className="text-sm">ID: {user.id.slice(-4)}</p>
+          <p className="text-sm">ID: {user._id?.slice(-4)}</p>
         </div>
       </div>
 

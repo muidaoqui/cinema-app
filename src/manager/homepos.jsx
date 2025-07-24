@@ -41,7 +41,7 @@ function HomePOS() {
   const showtime = selectedShowtime || { date: "-", time: "-" };
   const seats = selectedSeats || [];
 
-  navigate("/confirmpos", {
+  navigate("/manager/confirmpos", {
     state: {
       movie,
       showtime,

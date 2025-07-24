@@ -26,29 +26,37 @@ function Login() {
   };
 
   const handleVerifyOTP = async () => {
-    try {
-      const response = await axios.post(`${BASE_URL}/api/email/verify-otp`, { email, otp });
-      if (response.data.success) {
-        const user = response.data.user;
-        localStorage.setItem("user", JSON.stringify(user));
+  try {
+    const response = await axios.post(`${BASE_URL}/api/email/verify-otp`, { email, otp });
 
-        if (user.role.includes("Admin")) {
-  navigate("/admin/home");
-} else if (user.role.includes("Manager")) {
-  navigate("/manager/home");
-} else if (user.role.includes("Customer")) {
-  navigate("/home");
-} else {
-  setError("Không xác định được vai trò.");
-}
+    if (response.status === 200) {
+      const user = response.data.user;
+      console.log("User trả về:", user); // kiểm tra log
+      
+      localStorage.setItem("user", JSON.stringify(user));
 
+      if (user.role && user.role.includes("Admin")) {
+        navigate("/admin/home");
+      } else if (user.role && user.role.includes("Manager")) {
+        navigate("/manager/homepos");
+      } else if (user.role && user.role.includes("Customer")) {
+        navigate("/customer/home");
+        
       } else {
-        setError(response.data.message || "OTP không chính xác.");
+        // Nếu không có role hoặc role không đúng
+        console.warn("Vai trò không xác định hoặc thiếu");
+        navigate("/"); // fallback
       }
-    } catch (err) {
-      setError("Lỗi khi xác minh OTP.");
+    } else {
+      setError(response.data.message || "OTP không chính xác.");
     }
-  };
+  } catch (err) {
+    console.error("Lỗi khi xác minh OTP:", err);
+    setError("Lỗi khi xác minh OTP.");
+  }
+};
+
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-100 via-orange-200 to-yellow-100 px-4">

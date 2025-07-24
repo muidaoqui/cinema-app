@@ -75,7 +75,7 @@ function Coming() {
   };
 
   return (
-    <div className="flex-grow w-5/6 float-right p-4">
+    <div className="flex-grow  p-4">
       <Table dataSource={data} pagination={{ pageSize: 5 }} rowKey="_id">
         <Column title="Tên phim" dataIndex="nameMo" key="nameMo" />
         <Column title="Cụm rạp" dataIndex="cinemaMo" key="cinemaMo" render={(cinemas) => cinemas.map((c, i) => <Tag key={i}>{c}</Tag>)} />

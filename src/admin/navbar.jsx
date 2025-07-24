@@ -15,7 +15,7 @@ function NavbarAdmin() {
       key: 'account',
       icon: <MailOutlined />,
       label: 'Tài khoản',
-      path: '/account',
+      path: 'admin/home',
     },
     {
       key: 'movie',
@@ -25,12 +25,12 @@ function NavbarAdmin() {
         {
           key: 'all-movie',
           label: 'Danh sách phim',
-          path: '/movie',
+          path: '/admin/movie',
         },
         {
           key: 'coming-soon',
           label: 'Phim sắp chiếu',
-          path: '/coming',
+          path: '/admin/coming',
         },
       ],
     },
@@ -42,12 +42,12 @@ function NavbarAdmin() {
         {
           key: 'cinema-list',
           label: 'Danh sách rạp',
-          path: '/cinema',
+          path: '/admin/cinema',
         },
         {
           key: 'product',
           label: 'Sản phẩm',
-          path: '/product',
+          path: '/admin/product',
         },
       ],
     },
@@ -59,12 +59,12 @@ function NavbarAdmin() {
         {
           key: 'all-news',
           label: 'Danh sách tin',
-          path: '/news',
+          path: '/admin/news',
         },
         {
           key: 'discount',
           label: 'Khuyến mãi',
-          path: '/discount',
+          path: '/admin/discount',
         },
       ],
     },
@@ -89,7 +89,7 @@ function NavbarAdmin() {
   };
 
   return (
-    <div className="float-left w-1/6 h-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white transition-colors duration-300">
+    <div className=" bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white transition-colors duration-300">
       <Menu
         theme={currentTheme}
         onClick={onClick}
@@ -110,6 +110,6 @@ function NavbarAdmin() {
       </div>
     </div>
   );
-}
+};
 
 export default NavbarAdmin;

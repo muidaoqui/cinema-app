@@ -9,11 +9,11 @@ function Navbar() {
   const current = location.pathname;
 
   const navItems = [
-    { path: "/", icon: <AiOutlineHome size={24} />, label: "Trang chủ" },
-    { path: "/cinema", icon: <FaFilm size={24} />, label: "Rạp phim" },
-    { path: "/products", icon: <FaShoppingCart size={24} />, label: "Sản phẩm" },
-    { path: "/news", icon: <MdLocalMovies size={24} />, label: "Điện ảnh" },
-    { path: "/account", icon: <FaUser size={24} />, label: "Tài khoản" },
+    { path: "/customer/home", icon: <AiOutlineHome size={24} />, label: "Trang chủ" },
+    { path: "/customer/cinema", icon: <FaFilm size={24} />, label: "Rạp phim" },
+    { path: "/customer/product", icon: <FaShoppingCart size={24} />, label: "Sản phẩm" },
+    { path: "/customer/news", icon: <MdLocalMovies size={24} />, label: "Điện ảnh" },
+    { path: "/customer/account", icon: <FaUser size={24} />, label: "Tài khoản" },
   ];
 
   return (
