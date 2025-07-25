@@ -29,26 +29,26 @@ function Confirm() {
       }
 
       const payload = {
-  userId: user._id,
-  showtimeId: actualShowtimeId, // phải là ObjectId hợp lệ
-  movieId,
-  seats: selectedSeats, // mảng, không rỗng
-  combos: selectedCombos.map(c => ({
-    name: c.namePro,
-    quantity: c.quantity,
-    price: c.pricePro
-  })),
-  totalPrice,
-  comboTotal,
-  grandTotal,
-  date,
-  time,
-  cinema,
-  room
-};
+        userId: user._id,
+        showtimeId: actualShowtimeId, 
+        movieId,
+        seats: selectedSeats, 
+        combos: selectedCombos.map(c => ({
+          name: c.namePro,
+          quantity: c.quantity,
+          price: c.pricePro
+        })),
+        totalPrice,
+        comboTotal,
+        grandTotal,
+        date,
+        time,
+        cinema,
+        room
+      };
 
-console.log("Payload gửi lên:", payload);
-console.log("acctualShowtimeId:", actualShowtimeId);
+      console.log("Payload gửi lên:", payload);
+      console.log("acctualShowtimeId:", actualShowtimeId);
 
       const response = await axios.post('http://localhost:5000/api/bookings', payload);
       if (response.status === 201) {
@@ -74,7 +74,6 @@ console.log("acctualShowtimeId:", actualShowtimeId);
         >
           <FaArrowLeft />
         </button>
-        {/* Centered Title */}
         <div className="text-base font-semibold text-center">Giao dịch</div>
       </div>
 
